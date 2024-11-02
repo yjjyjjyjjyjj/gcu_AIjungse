@@ -1,48 +1,20 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="./css/bootstrap.min.css" rel="stylesheet">
-    <title>가리단길 - 회원가입</title>
-</head>
+<?php
+include_once "./inc/header.php";
+if(isset($_SESSION['user_idx'])){
+    echo '
+        <script>
+            location.href="./index.php";
+        </script>
+    ';
+    exit();
+}
+?>
+
 <body style="padding-top: 70px;">
-<!-- Navigation Bar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top" style="background-color: #dee2e6!important">>
-    <div class="container-fluid">
-        <a class="navbar-brand" href="./index.php">가리단길</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link" href="./index.php#introduction">소개</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#map" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        맛집/놀곳 지도
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="./bokjeong.php">복정동</a></li>
-                        <li><a class="dropdown-item" href="./taepyeong.php">태평동</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="./index.php#contact">문의</a>
-                </li>
-            </ul>
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="./login.php">로그인</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="./join.php">회원가입</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+
+<?php
+include_once "./inc/navbar.php";
+?>
 
 <!-- Signup Form Section -->
 <section class="py-5">
@@ -55,7 +27,7 @@
                         <label for="username" class="form-label">아이디</label>
                         <div class="input-group">
                             <input type="text" class="form-control" id="username" placeholder="아이디를 입력하세요">
-                            <button class="btn btn-outline-secondary" type="button" id="checkUsername">중복확인</button>
+                            <button class="btn btn-primary" type="button" id="checkUsername">중복확인</button>
                         </div>
                     </div>
                     <div class="mb-3">
@@ -67,7 +39,7 @@
                         <input type="password" class="form-control" id="confirmPassword" placeholder="비밀번호를 다시 입력하세요">
                     </div>
                     <div class="text-center">
-                        <button type="submit" class="btn btn-primary">가입</button>
+                        <button id="joinSubmit" type="button" class="btn btn-primary">가입</button>
                     </div>
                 </form>
             </div>
@@ -85,5 +57,76 @@
 </footer>
 
 <script src="./js/bootstrap.bundle.min.js"></script>
+<script>
+    $('#checkUsername').on('click', function () {
+        if($('#username').val() != ''){
+            $.ajax({
+                url:'./ajax/chk_user_id.php',
+                data: {user_id : $('#username').val()},
+                method: "POST",
+                dataType: "json",
+                success: function (res) {
+                    if(res.cnt == 0){
+                        alert("사용 가능한 아이디입니다.");
+                        $('#checkUsername').removeClass('btn-primary');
+                        $('#checkUsername').addClass('btn-success');
+                        $('#username').attr("disabled", true);
+                        $('#checkUsername').attr("disabled", true);
+                    }else{
+                        alert("이미 사용 중인 아이디입니다.");
+                        $('#username').focus();
+                    }
+                }
+            })
+        }else{
+            alert("Id를 입력해주세요.");
+            return false;
+        }
+    });
+    
+    $('#joinSubmit').on('click', function () {
+        if($('#username').val() == ''){
+            alert("아이디를 입력해주세요.");
+            return false;
+        }
+        if(!$('#checkUsername').hasClass('btn-success') && $('#username').attr('disabled') != true && $('#checkUsername').attr('disabled') != true){
+            alert("아이디 중복여부를 체크해주세요.");
+            return false;
+        }
+        if($('#confirmPassword').val() == ''){
+            alert("비밀번호 확인란을 입력해주세요.");
+            return false;
+        }
+        if($('#password').val() == ''){
+            alert("비밀번호를 입력해주세요.");
+            return false;
+        }
+        if($('#password').val() != $('#confirmPassword').val()){
+            alert("비밀번호 확인이 일치하지 않습니다.");
+            return false;
+        }
+
+        $.ajax({
+            url:'./ajax/join.php',
+            data: {
+                user_id : $('#username').val(),
+                user_pw : $('#password').val()
+            },
+            method: "POST",
+            dataType: "json",
+            success: function (res) {
+                if(res.status == 'duplicate'){
+                    alert(res.text);
+                    location.reload();
+                }else if(res.status == 'error'){
+                    alert(res.text);
+                }else{
+                    alert(res.text);
+                    location.href = './login.php';
+                }
+            }
+        })
+    });
+</script>
 </body>
 </html>

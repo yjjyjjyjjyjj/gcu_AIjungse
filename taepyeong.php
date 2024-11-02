@@ -36,13 +36,13 @@ include_once "./inc/navbar.php";
             <div class="modal-footer">
                 <?php
                 if(isset($_SESSION['user_idx'])){
-                ?>
+                    ?>
                     <button data-idx="" id="locationZzim" type="button" class="btn btn-outline-danger"><i class="bi bi-heart"></i></button>
-                <?php
+                    <?php
                 }else{
-                ?>
+                    ?>
                     <button style="display: none" id="locationZzim" type="button" class="btn btn-outline-danger"><i class="bi bi-heart"></i></button>
-                <?php
+                    <?php
                 }
                 ?>
             </div>
@@ -72,7 +72,7 @@ include_once "./inc/navbar.php";
     // 지도 초기화 함수
     var container = document.getElementById('map'); // 지도를 표시할 div
     var options = {
-        center: new kakao.maps.LatLng(37.454937, 127.128533), // 지도의 초기 중심 좌표 (예: 서울 시청)
+        center: new kakao.maps.LatLng(37.445084, 127.136794), // 지도의 초기 중심 좌표 (예: 서울 시청)
         level: 4 // 지도의 확대 레벨
     };
 
@@ -80,11 +80,11 @@ include_once "./inc/navbar.php";
 
 
     var positions = [
-    <?php
-        $get_location_sql = "SELECT * FROM location WHERE location_neighborhood = 'bok'";
+        <?php
+        $get_location_sql = "SELECT * FROM location WHERE location_neighborhood = 'tae'";
         $get_location_result = mysqli_query($conn, $get_location_sql);
         while($row = mysqli_fetch_assoc($get_location_result)){
-        echo "
+            echo "
             {
                 idx: ".$row['location_idx'].",
                 title: '".$row['location_title']."',
@@ -92,7 +92,7 @@ include_once "./inc/navbar.php";
             },
         ";
         }
-    ?>
+        ?>
     ];
 
     //마커 imgSrc
@@ -154,10 +154,10 @@ include_once "./inc/navbar.php";
             })
         };
     }
-    
+
     // 마커를 지도에 표시
     marker.setMap(map);
-    
+
     //찜버튼 click
     $("#locationZzim").on("click",function () {
         let method;
