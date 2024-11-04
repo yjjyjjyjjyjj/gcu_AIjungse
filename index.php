@@ -104,7 +104,12 @@ include_once "./inc/navbar.php";
 
         if (!storeName || !phoneNumber || !message) {
             alert('모든 필드를 입력해 주세요.');
+            return false;
         }
+
+        alert("전송되었습니다 :)\n확인 후 연락드리겠습니다.");
+
+        location.reload();
     });
 </script>
 </body>
